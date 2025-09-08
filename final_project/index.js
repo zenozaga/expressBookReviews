@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 
 const { jwt_secret, session_secret } = require("./config/auth.js");
-const books = require("./router/booksdb.js");
+const { appConfig } = require("./config/app.js");
 const customer_routes = require("./router/auth_users.js").authenticated;
 const genl_routes = require("./router/general.js").general;
 
@@ -35,9 +35,7 @@ app.use("/customer/auth/*", function auth(req, res, next) {
   });
 });
 
-const PORT = 5000;
-
 app.use("/customer", customer_routes);
 app.use("/", genl_routes);
 
-app.listen(PORT, () => console.log("Server is running"));
+app.listen(appConfig.port, () => console.log("Server is running"));
