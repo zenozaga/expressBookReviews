@@ -2,7 +2,7 @@
 
 ## Tasks 10-13
 
-These tasks are to be done in the `final_project/teaks` folder.
+These tasks are to be done in the `final_project/tasks` folder.
 Requirements for these tasks is use axios to make HTTP requests and put
 in practice the three different ways of handling asynchronous code in JavaScript.
 

@@ -4,7 +4,7 @@
 
 const axios = require("axios");
 
-const author = "jane austen";
+const author = "unknown";
 const url = `http://localhost:5000/author/${encodeURIComponent(author)}`;
 
 async function getBooksByAuthor() {

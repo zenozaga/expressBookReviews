@@ -10,7 +10,6 @@ const url = `http://localhost:5000/isbn/${isbn}`;
 const promise = new Promise((resolve) => {
   axios
     .get(url)
-    // using nested promise to extract data
     .then((response) => resolve(response.data));
 });
 

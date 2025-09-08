@@ -1,10 +1,10 @@
 const express = require("express");
 let books = require("./booksdb.js");
-let { isValid, users, registerUser } = require("./auth_users.js");
-const public_users = express.Router();
+let { isValid, registerUser } = require("./auth_users.js");
+const { $error, $send, $response } = require("../serialize/response.js");
 
-// helper to send error response
-const $error = (res, message) => res.status(400).json({ message });
+
+const public_users = express.Router();
 
 // Task 6: Register New user – 3 Points
 // Register a new user
@@ -25,7 +25,7 @@ public_users.post("/register", (req, res) => {
   // register the user
   registerUser(username, password);
 
-  res.json({ message: "User successfully registered. Now you can login" });
+  $send(res,`Welcome aboard, ${username}! You have successfully registered`);
 });
 
 // Task 1: Get the book list available in the shop.- 2 Points
@@ -36,7 +36,7 @@ public_users.get("/", function (req, res) {
     ...data,
   }));
 
-  return res.send(JSON.stringify(list, null, 4));
+  return $response(res, list);
 });
 
 // Task 2: Get the books based on ISBN.- 2 Points
@@ -46,7 +46,7 @@ public_users.get("/isbn/:isbn", function (req, res) {
   const book = books[isbn];
   if (!book) return res.status(404).json({ message: "Book not found" });
 
-  return res.send(JSON.stringify(book, null, 4));
+  return $response(res, book);
 });
 
 // Task 3: Get all books by Author. -2 Points
@@ -66,11 +66,9 @@ public_users.get("/author/:author", function (req, res) {
   }
 
   if (result.length === 0)
-    return res
-      .status(404)
-      .json({ message: "Not found any book with that author" });
+    return $error(res, "Not found any book with that author", 404);
 
-  return res.send(JSON.stringify(result, null, 4));
+  return $response(res, result);
 });
 
 // Task 4: Get all books based on Title - 2 Points
@@ -90,11 +88,9 @@ public_users.get("/title/:title", function (req, res) {
   }
 
   if (result.length === 0)
-    return res
-      .status(404)
-      .json({ message: "Not found any book with that title" });
+    return $error(res, "Not found any book with that title", 404);
 
-  return res.send(JSON.stringify(result, null, 4));
+  return $response(res, result);
 });
 
 //  Task 5: Get book Review. - 2 Points
@@ -103,12 +99,9 @@ public_users.get("/review/:isbn", function (req, res) {
   const isbn = req.params.isbn;
   const book = books[isbn];
 
-  if (!book)
-    return res
-      .status(404)
-      .json({ message: "Not found any book with that ISBN" });
+  if (!book) return $error(res, "Not found any book with that ISBN", 404);
 
-  return res.send(JSON.stringify(book.reviews, null, 4));
+  return $response(res,  book.reviews);
 });
 
 module.exports.general = public_users;

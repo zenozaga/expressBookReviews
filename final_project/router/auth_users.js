@@ -1,7 +1,10 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 let books = require("./booksdb.js");
+
 const { jwt_secret } = require("../config/auth.js");
+const { $error, $send } = require("../serialize/response.js");
+
 const regd_users = express.Router();
 
 let users = [];
@@ -40,9 +43,6 @@ const registerUser = (username, password) => {
 /// Routes
 //////////////////////////////
 
-// helper to send error response
-const $error = (res, message) => res.status(400).json({ message });
-
 // Task 7: Login as a Registered user - 3 Points
 //only registered users can login
 regd_users.post("/login", (req, res) => {
@@ -60,10 +60,10 @@ regd_users.post("/login", (req, res) => {
 
   req.session.save((err) => {
     // if no error, respond with success
-    if (!err) return res.json({ message: "User successfully logged in" });
+    if (err) return $error(res, "An error occurred while trying to log in");
 
     // error trying to save session
-    return res.status(500).send("An error occurred while trying to log in");
+    return $send(res, `User successfully logged in, ${username}`);
   });
 });
 
@@ -76,17 +76,12 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   const book = books[isbn];
 
   // if book not found
-  if (!book) return res.status(404).json({ message: "Book not found" });
+  if (!book) return $error(res, "Book not found", 404);
 
-  // add add or update review
-  const isUpdate = book.reviews[username] !== undefined;
+  const action = book.reviews[username] ? "updated" : "added";
   book.reviews[username] = review;
 
-  if (isUpdate) {
-    res.json({ message: "Review updated successfully" });
-  } else {
-    res.json({ message: "Review added successfully" });
-  }
+  $send(res, `Your review for “${book.title}” was ${action}: ${review}`);
 });
 
 // Task 9: Delete book review added by that particular user - 2 Points
@@ -97,17 +92,15 @@ regd_users.delete("/auth/review/:isbn", (req, res) => {
   const book = books[isbn];
 
   // if book not found
-  if (!book) return res.status(404).json({ message: "Book not found" });
+  if (!book) return $error(res, "Book not found", 404);
 
-  // if review not found
-  if (book.reviews[username] === undefined)
-    return res.status(404).json({ message: "Review not found" });
+  const review = book.reviews[username];
+  if (review === undefined) return $error(res, "Review not found", 404);
 
   // delete review
   delete book.reviews[username];
 
-
-  res.json({ message: "Review was removed successfully" });
+  $send(res, `Your review '${review}' for “${book.title}” was deleted.`);
 });
 
 module.exports.users = users;
