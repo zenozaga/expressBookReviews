@@ -18,3 +18,8 @@ in practice the three different ways of handling asynchronous code in JavaScript
 
 #### Task 13: Search by Title - 2 Points
     path: `final_project/tasks/search-by-title.js`
+
+
+## Disclaimer
+This project was created only for educational purposes as part of a Coursera course.
+It is not intended for real business use.
